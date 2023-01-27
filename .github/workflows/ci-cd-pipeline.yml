@@ -37,9 +37,9 @@ jobs:
           echo "current_version=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)" >> $GITHUB_ENV
 
   test:
+    runs-on: ubuntu-latest
     need: build
     if: ${{ success() }}
-    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout
@@ -55,9 +55,9 @@ jobs:
         run: mvn -B package --file pom.xml
 
   build-docker-image:
+    runs-on: ubuntu-latest
     need: test
     if: ${{ success() && github.event_name == "push" && (github.ref_name == "develop" || github.ref_name == "main") }}
-    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout
