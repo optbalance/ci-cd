@@ -38,7 +38,7 @@ jobs:
 
   test:
     runs-on: ubuntu-latest
-    need: build
+    needs: build
     if: ${{ success() }}
 
     steps:
@@ -56,7 +56,7 @@ jobs:
 
   build-docker-image:
     runs-on: ubuntu-latest
-    need: test
+    needs: test
     if: ${{ success() && github.event_name == "push" && (github.ref_name == "develop" || github.ref_name == "main") }}
 
     steps:
