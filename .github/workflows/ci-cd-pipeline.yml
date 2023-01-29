@@ -33,10 +33,6 @@ jobs:
       - name: Build with Maven
         run: mvn -B -DskipTests package --file pom.xml
 
-      - name: Set Release version env variable
-        run: |
-          "current_version=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)" >> $GITHUB_ENV
-
   test:
     runs-on: ubuntu-latest
     needs: build
@@ -59,7 +55,7 @@ jobs:
   build-docker-image:
     runs-on: ubuntu-latest
     needs: test
-    if: ${{ success() && github.event_name == 'push' && (github.ref_name == 'develop' || github.ref_name == 'main') }}
+    if: ${{ success() }}#&& github.event_name == 'push' && (github.ref_name == 'develop' || github.ref_name == 'main') }}
 
     steps:
       - name: Checkout
@@ -74,10 +70,10 @@ jobs:
 
       - name: Define current version
         run: |
-          "current_version=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)" >> $GITHUB_ENV
+          echo "current_version=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)" >> $GITHUB_ENV
 
       - name: Sets environment vars for dev
-        if: ${{ github.ref_name == 'develop' }}
+        if: ${{ github.ref_name == 'develop' || contains(github.ref_name, "feature") }}
         run: |
           echo "docker_image_target=dev" >> $GITHUB_ENV
 
