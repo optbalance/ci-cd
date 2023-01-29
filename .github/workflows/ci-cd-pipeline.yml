@@ -55,7 +55,7 @@ jobs:
   build-docker-image:
     runs-on: ubuntu-latest
     needs: test
-    if: ${{ success() }}# && github.event_name == 'push' && (github.ref_name == 'develop' || github.ref_name == 'main') }}
+    if: ${{ success() && github.event_name == 'push' && (github.ref_name == 'develop' || github.ref_name == 'main') }}
 
     steps:
       - name: Checkout
@@ -72,7 +72,7 @@ jobs:
         run: mvn -B -DskipTests package --file pom.xml
 
       - name: Sets environment vars for dev
-        if: ${{ github.ref_name == 'develop' || contains(github.ref_name, 'feature') }}
+        if: ${{ github.ref_name == 'develop' }}
         run: |
           echo "docker_image_target=dev" >> $GITHUB_ENV
 
