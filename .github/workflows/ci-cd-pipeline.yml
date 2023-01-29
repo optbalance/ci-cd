@@ -32,6 +32,10 @@ jobs:
 
       - name: Build with Maven
         run: mvn -B -DskipTests package --file pom.xml
+        
+      - name: Test format expresion
+        run: |
+          echo "${{ format('{0}-{1}', ${{env.docker_image_target}}, ${{env.current_version}}) }}"
 
   test:
     runs-on: ubuntu-latest
