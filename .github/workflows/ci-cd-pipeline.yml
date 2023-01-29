@@ -73,7 +73,7 @@ jobs:
           echo "current_version=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)" >> $GITHUB_ENV
 
       - name: Sets environment vars for dev
-        if: ${{ github.ref_name == 'develop' || contains(github.ref_name, "feature") }}
+        if: ${{ github.ref_name == 'develop' || contains(github.ref_name, 'feature') }}
         run: |
           echo "docker_image_target=dev" >> $GITHUB_ENV
 
