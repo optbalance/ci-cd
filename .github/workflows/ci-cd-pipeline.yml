@@ -32,10 +32,6 @@ jobs:
 
       - name: Build with Maven
         run: mvn -B -DskipTests package --file pom.xml
-        
-      - name: Test format expresion
-        run: |
-          echo "${{ format('{0}-{1}', ${{env.docker_image_target}}, ${{env.current_version}}) }}"
 
   test:
     runs-on: ubuntu-latest
@@ -59,7 +55,7 @@ jobs:
   build-docker-image:
     runs-on: ubuntu-latest
     needs: test
-    if: ${{ success() && github.event_name == 'push' && (github.ref_name == 'develop' || github.ref_name == 'main') }}
+    if: ${{ success() }}# && github.event_name == 'push' && (github.ref_name == 'develop' || github.ref_name == 'main') }}
 
     steps:
       - name: Checkout
@@ -75,12 +71,8 @@ jobs:
       - name: Build with Maven
         run: mvn -B -DskipTests package --file pom.xml
 
-      - name: Get current version
-        run: |
-          echo "current_version=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)" >> $GITHUB_ENV
-
       - name: Sets environment vars for dev
-        if: ${{ github.ref_name == 'develop' }}
+        if: ${{ github.ref_name == 'develop' || contains(github.ref_name, 'feature') }}
         run: |
           echo "docker_image_target=dev" >> $GITHUB_ENV
 
@@ -88,6 +80,10 @@ jobs:
         if: ${{ github.ref_name == 'main' }}
         run: |
           echo "docker_image_target=prod" >> $GITHUB_ENV
+        
+      - name: Get current version
+        run: |
+          echo "current_version=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)" >> $GITHUB_ENV
 
       - name: Docker meta
         id: meta
@@ -95,7 +91,7 @@ jobs:
         with:
           images: optbalance/my-project
           tags: |
-            type=raw, value=format('{0}-{1}', ${{env.docker_image_target}}, ${{env.current_version}})
+            type=raw, value=${{env.docker_image_target}}-${{env.current_version}}
 
       - name: Login to Docker Hub
         uses: docker/login-action@v2
